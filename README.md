@@ -148,39 +148,39 @@
 
 #####  新增初始化 git 的 prompt
 
-> a. **VS Code 右上角，齒輪處點下新增**
+- **VS Code 右上角，齒輪處點下新增**
 
    ![截圖 2025-10-05 晚上11.38.40](https://hackmd.io/_uploads/H1red1-pll.png)
 
-> b. **正上方是點下新增一個 prompt 檔**
+- **正上方是點下新增一個 prompt 檔**
 
    ![截圖 2025-10-05 晚上11.39.01](https://hackmd.io/_uploads/rJIzuyWplx.png)
 
-> c. **點選你要存放的位置，選擇第一個，存放在 .github/prompts 下**
+- **點選你要存放的位置，選擇第一個，存放在 .github/prompts 下**
 
    *另外一個選項，使用者資料夾後面再說*
 
    ![截圖 2025-10-05 晚上11.39.12](https://hackmd.io/_uploads/B1Emu1WTll.png)
 
-> d. **空的 prompt 檔產生**
+- **空的 prompt 檔產生**
 
    ![截圖 2025-10-05 晚上11.40.02](https://hackmd.io/_uploads/HJy4u1Z6xx.png)
 
-> e. **查看檔案儲存位置**
+- **查看檔案儲存位置**
 
    ![截圖 2025-10-05 晚上11.58.51](https://hackmd.io/_uploads/HJ-p_JWTel.png)
 
-> f. **魔法打敗魔法，自己不想寫，請它寫**
+- **魔法打敗魔法，自己不想寫，請它寫**
 
    ```
    你是一個擅長使用Git 的專家，撰寫 git init 的 promot，並用繁體中文輸出
    ```
 
-> g. **結果內容如下圖**
+- **結果內容如下圖**
 
    ![截圖 2025-10-06 凌晨12.00.30](https://hackmd.io/_uploads/H1SXFkbpee.png)
 
-> h. **試試看，在右下角視窗輸入 / ，就會出現你剛剛寫的 git_init**
+- **試試看，在右下角視窗輸入 / ，就會出現你剛剛寫的 git_init**
 
    ![截圖 2025-10-05 晚上11.44.19](https://hackmd.io/_uploads/Sy5NOJZpge.png)
 
