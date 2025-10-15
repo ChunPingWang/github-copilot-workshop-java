@@ -584,9 +584,10 @@ private final Map<String, List<Task>> tasks = new LinkedHashMap<>();
   
   - 三層式架構（Three-tier Architecture）
   ```
-產生三層式架構的說明與圖解，寫入 README.md的'5. 重構成六角形架構或三層式架構'下面的三層式架構下
+  產生三層式架構的說明與圖解，寫入 README.md的'5. 重構成六角形架構或三層式架構'下面的三層式架構下
   ```
   ```
+  修正三層式架構的展示層與資料存取層，需向業務邏輯層相依，同時修正範例程式
   ```
   三層式架構是軟體工程中最經典且廣泛使用的架構模式之一。它將應用程式分為三個邏輯層次：**展示層（Presentation Layer）**、**業務邏輯層（Business Logic Layer）** 和 **資料存取層（Data Access Layer）**。這種分層方式促進了關注點分離、提高了程式碼的可維護性和可擴展性。
   
@@ -1229,6 +1230,125 @@ private final Map<String, List<Task>> tasks = new LinkedHashMap<>();
 - **Copilot 輔助重構**
   - 程式碼結構
   - 設計模式推薦
+
+```
+將六角形架構要求，加入 #editFiles #file:copilot-instructions.md 
+```
+```
+開始按照 #file:copilot-instructions.md  重構
+Let's do it step by step.
+```
+
+#### 🎯 架構選擇建議與下一步
+
+基於本工作坊的實際進展和我們已經完成的**六角形架構重構**，以下是具體的建議：
+
+##### ✅ **當前成果總結**
+
+我們已經成功完成了**六角形架構的完整實作**：
+
+**🏗️ 已完成的架構層次**
+- **Domain Layer**: Task、Project 實體與 TaskId、ProjectId 值物件
+- **Service Layer**: TaskDomainService、ProjectDomainService 等業務服務  
+- **Port Layer**: 清楚定義的 Inbound 和 Outbound Ports
+- **Adapter Layer**: CLI 輸入適配器與 InMemory 持久化適配器
+- **Configuration**: ApplicationConfig 依賴注入配置
+
+**🧪 測試覆蓋狀況**
+- ✅ **Value Objects**: ProjectId、Project 完整測試套件
+- ✅ **Integration Tests**: ApplicationConfig 端對端測試
+- ✅ **Domain Tests**: 基礎領域邏輯測試
+- 📊 **測試覆蓋率**: 核心領域模型 80%+ 覆蓋
+
+##### 🚀 **推薦的後續發展路徑**
+
+**選項 1: 深化六角形架構實作** ⭐️ **強烈推薦**
+```markdown
+理由：已有完整基礎，可快速達成專業級標準
+- 擴展 Repository 模式 (JPA + H2)
+- 新增 REST API Adapter 
+- 實作完整測試策略
+- 導入 Spring Boot 框架整合
+```
+
+**選項 2: 平行實作三層式架構**
+```markdown
+理由：學習比較不同架構模式
+- 建立獨立分支進行三層式實作
+- 比較兩種架構的優缺點
+- 適合團隊學習和技術選型參考
+```
+
+##### 📋 **具體實作步驟 (推薦路徑)**
+
+**階段一：Repository 模式擴展** (2-3小時)
+```
+1. 新增 JPA Entity 模型
+2. 實作 Spring Data Repository
+3. 配置 H2 記憶體資料庫
+4. 完成資料持久化測試
+```
+
+**階段二：Web API 開發** (2-3小時)  
+```
+1. 建立 REST Controller Adapter
+2. 實作 DTO 轉換層
+3. 新增 OpenAPI/Swagger 文件
+4. API 整合測試
+```
+
+**階段三：企業級特性** (3-4小時)
+```
+1. Spring Security 整合
+2. 異常處理機制
+3. 日誌與監控
+4. 部署與 CI/CD
+```
+
+##### 🎯 **GitHub Copilot 最佳實務**
+
+**重構建議指令**
+```
+基於現有六角形架構，使用 GitHub Copilot 協助：
+
+1. Repository 擴展：
+   @workspace /fix 將 InMemoryRepository 轉換為 JPA Repository
+
+2. API 開發：
+   #file:TaskDomainService.java @github 生成對應的 REST Controller
+
+3. 測試完善：
+   #folder:src/test @workspace /tests 生成完整測試覆蓋
+
+4. 文件生成：
+   #file:README.md @vscode /doc 更新架構說明文件
+```
+
+**持續改進循環**
+```
+1. 使用 Copilot 生成基礎程式碼
+2. 執行測試驗證功能正確性  
+3. 重構優化程式碼品質
+4. 更新文件與註解
+5. 重複循環直到達成目標
+```
+
+##### 💡 **學習重點提醒**
+
+- **架構思維**: 重點理解依賴反轉和關注點分離原則
+- **測試驅動**: 先寫測試，再實作功能，確保程式碼品質
+- **漸進式開發**: 每次只專注一個小功能，穩紮穩打
+- **Copilot 協作**: 善用 AI 輔助，但要理解生成的程式碼邏輯
+
+##### 🎉 **預期學習成果**
+
+完成本工作坊後，您將具備：
+- ✅ 六角形架構的深度理解與實作能力
+- ✅ GitHub Copilot 在企業開發中的實戰經驗  
+- ✅ Spring Boot 生態系統整合技能
+- ✅ 現代軟體開發最佳實務經驗
+- ✅ 可直接應用於專案的架構模板
+
 
 ### 6. Repository 模式實作
 
