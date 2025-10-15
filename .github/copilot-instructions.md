@@ -89,234 +89,36 @@ class TaskServiceTest {
 }
 ```
 
-## 🏗️ 架構模式
-
-### 套件結構
-```
-com.codurance.training.tasks/
-├── controller/     # REST API 控制器
-├── service/        # 業務邏輯服務
-├── repository/     # 資料存取層
-├── model/          # 實體模型
-├── dto/            # 資料傳輸物件
-├── config/         # 配置類別
-└── exception/      # 自訂例外
-```
-
-### 依賴注入
-- 使用 Constructor Injection
-- 避免使用 `@Autowired` 標註在欄位上
-- 介面與實作分離
-
-### 例外處理
-- 使用自訂例外類別
-- 實作全域例外處理器
-- 提供有意義的錯誤訊息
-
-### 🔷 六角形架構 (Hexagonal Architecture)
+## 🏗️ 六角形架構概述
 
 本專案採用六角形架構模式，確保業務邏輯與外部依賴解耦。
 
-#### 核心原則
+### 核心原則
 - **依賴倒置**: 所有依賴都指向核心業務邏輯
 - **介面隔離**: 透過 Port 和 Adapter 模式分離關注點
 - **可測試性**: 核心邏輯完全獨立於外部框架
 - **技術無關性**: 業務邏輯不依賴具體技術實作
 
-#### 套件結構
+### 高階套件結構
 ```
 com.codurance.training.tasks/
 ├── domain/                    # 領域層 (核心業務邏輯)
-│   ├── model/                 # 領域實體
-│   │   ├── Task.java
-│   │   ├── Project.java
-│   │   └── TaskStatus.java
-│   ├── port/                  # 主要介面定義
-│   │   ├── inbound/           # 輸入埠 (Use Cases)
-│   │   │   ├── CreateTaskUseCase.java
-│   │   │   ├── FindTaskUseCase.java
-│   │   │   └── CompleteTaskUseCase.java
-│   │   └── outbound/          # 輸出埠 (Repository 介面)
-│   │       ├── TaskRepository.java
-│   │       ├── ProjectRepository.java
-│   │       └── NotificationService.java
-│   ├── service/               # 領域服務 (Use Case 實作)
-│   │   ├── TaskDomainService.java
-│   │   └── ProjectDomainService.java
+│   ├── model/                 # 領域實體和值物件
+│   ├── port/                  # 埠介面定義
+│   ├── service/               # 領域服務
 │   └── exception/             # 領域異常
-│       ├── TaskNotFoundException.java
-│       └── BusinessRuleViolationException.java
-│
 ├── adapter/                   # 適配器層
-│   ├── inbound/               # 輸入適配器
-│   │   ├── web/               # Web 適配器 (REST API)
-│   │   │   ├── TaskController.java
-│   │   │   ├── ProjectController.java
-│   │   │   └── dto/           # Web DTOs
-│   │   │       ├── CreateTaskRequest.java
-│   │   │       └── TaskResponse.java
-│   │   └── cli/               # 命令列適配器
-│   │       └── TaskListCLI.java
-│   └── outbound/              # 輸出適配器
-│       ├── persistence/       # 持久化適配器
-│       │   ├── TaskJpaAdapter.java
-│       │   ├── ProjectJpaAdapter.java
-│       │   └── entity/        # JPA 實體
-│       │       ├── TaskEntity.java
-│       │       └── ProjectEntity.java
-│       └── notification/      # 通知適配器
-│           └── EmailNotificationAdapter.java
-│
+│   ├── inbound/               # 輸入適配器 (Web, CLI)
+│   └── outbound/              # 輸出適配器 (Database, Notification)
+├── application/               # 應用程式層 (選用)
+│   ├── service/               # 應用服務
+│   ├── command/               # 應用命令
+│   └── query/                 # 應用查詢
 └── config/                    # 配置層
-    ├── ApplicationConfig.java
-    └── DatabaseConfig.java
+    └── ApplicationConfig.java
 ```
 
-#### 實作規範
-
-**1. 領域層規範**
-```java
-// Use Case 介面 (輸入埠)
-public interface CreateTaskUseCase {
-    TaskId execute(CreateTaskCommand command);
-}
-
-// Repository 介面 (輸出埠)
-public interface TaskRepository {
-    void save(Task task);
-    Optional<Task> findById(TaskId id);
-    List<Task> findByProjectId(ProjectId projectId);
-}
-
-// 領域服務實作
-@Component
-public class TaskDomainService implements CreateTaskUseCase {
-    private final TaskRepository taskRepository;
-    
-    public TaskDomainService(TaskRepository taskRepository) {
-        this.taskRepository = taskRepository;
-    }
-    
-    @Override
-    public TaskId execute(CreateTaskCommand command) {
-        // 純業務邏輯，無外部框架依賴
-        Task task = Task.create(command.getDescription(), command.getProjectId());
-        taskRepository.save(task);
-        return task.getId();
-    }
-}
-```
-
-**2. 適配器層規範**
-```java
-// Web 適配器 (輸入適配器)
-@RestController
-@RequestMapping("/api/tasks")
-public class TaskController {
-    private final CreateTaskUseCase createTaskUseCase;
-    
-    public TaskController(CreateTaskUseCase createTaskUseCase) {
-        this.createTaskUseCase = createTaskUseCase;
-    }
-    
-    @PostMapping
-    public ResponseEntity<TaskResponse> createTask(@RequestBody CreateTaskRequest request) {
-        CreateTaskCommand command = request.toCommand();
-        TaskId taskId = createTaskUseCase.execute(command);
-        return ResponseEntity.ok(TaskResponse.from(taskId));
-    }
-}
-
-// 持久化適配器 (輸出適配器)
-@Repository
-public class TaskJpaAdapter implements TaskRepository {
-    private final TaskJpaRepository jpaRepository;
-    private final TaskMapper mapper;
-    
-    @Override
-    public void save(Task task) {
-        TaskEntity entity = mapper.toEntity(task);
-        jpaRepository.save(entity);
-    }
-    
-    @Override
-    public Optional<Task> findById(TaskId id) {
-        return jpaRepository.findById(id.getValue())
-            .map(mapper::toDomain);
-    }
-}
-```
-
-#### 開發準則
-
-**輸入埠 (Inbound Ports)**
-- 定義應用程式的 Use Cases
-- 介面應該表達業務意圖，不包含技術細節
-- 方法名稱使用業務術語 (如: `createTask`, `completeTask`)
-
-**輸出埠 (Outbound Ports)**
-- 定義領域層對外部系統的需求
-- 使用領域語言，避免技術實作細節
-- 回傳領域物件，不洩漏基礎設施概念
-
-**領域模型**
-- 完全獨立於框架和外部技術
-- 包含業務邏輯和不變量
-- 使用 Value Objects 確保型別安全
-
-**適配器實作**
-- 負責技術細節和外部系統整合
-- 實作依賴注入配置
-- 處理資料格式轉換 (DTO ↔ Domain)
-
-#### 測試策略
-
-**領域層測試**
-```java
-@ExtendWith(MockitoExtension.class)
-class TaskDomainServiceTest {
-    @Mock
-    private TaskRepository taskRepository;
-    
-    @InjectMocks
-    private TaskDomainService taskDomainService;
-    
-    @Test
-    void execute_whenValidCommand_thenCreateTask() {
-        // 純業務邏輯測試，無外部依賴
-        CreateTaskCommand command = new CreateTaskCommand("學習六角形架構");
-        
-        TaskId result = taskDomainService.execute(command);
-        
-        verify(taskRepository).save(any(Task.class));
-        assertThat(result).isNotNull();
-    }
-}
-```
-
-**適配器測試**
-```java
-@WebMvcTest(TaskController.class)
-class TaskControllerTest {
-    @MockBean
-    private CreateTaskUseCase createTaskUseCase;
-    
-    @Test
-    void createTask_whenValidRequest_thenReturnCreated() {
-        // 測試 HTTP 層面的適配器邏輯
-    }
-}
-
-@DataJpaTest
-class TaskJpaAdapterTest {
-    @Test
-    void save_whenValidTask_thenPersistToDatabase() {
-        // 測試持久化適配器
-    }
-}
-```
-
-#### 依賴方向檢查
+### 依賴方向檢查
 - ✅ **Adapter → Domain**: 適配器可以依賴領域層
 - ✅ **Domain → Port**: 領域層可以依賴自己定義的介面
 - ❌ **Domain → Adapter**: 領域層絕不可依賴適配器
@@ -426,6 +228,15 @@ java {
 - [Mockito Documentation](https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html)
 - [Spring Boot Reference Documentation](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/)
 - [Gradle User Manual](https://docs.gradle.org/current/userguide/userguide.html)
+
+## 📄 分層指引文件
+
+本專案的詳細分層開發規範已分散至各專門的指引文件：
+
+- **領域層**: 參考 `.github/instructions/domain.instructions.md`
+- **適配器層**: 參考 `.github/instructions/adapter.instructions.md`
+- **應用程式層**: 參考 `.github/instructions/application.instructions.md`
+- **配置層**: 參考 `.github/instructions/configuration.instructions.md`
 
 ---
 
