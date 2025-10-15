@@ -1,0 +1,94 @@
+plugins {
+    id 'java'
+    id 'jacoco'
+}
+
+group = 'com.codurance.training'
+version = '1.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // JUnit 5
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.2'
+    
+    // Mockito
+    testImplementation 'org.mockito:mockito-core:5.1.1'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.1.1'
+    
+    // AssertJ (更流暢的斷言)
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+}
+
+test {
+    useJUnitPlatform()
+    
+    // 測試報告配置
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = false
+    }
+    
+    // 記憶體配置
+    minHeapSize = "128m"
+    maxHeapSize = "512m"
+}
+
+// Jacoco 覆蓋率配置
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+jacocoTestReport {
+    dependsOn test
+    
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+    
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                '**/TaskList.class' // 排除 main 方法所在的類別
+            ])
+        }))
+    }
+}
+
+// 確保測試覆蓋率達到要求
+jacocoTestCoverageVerification {
+    dependsOn jacocoTestReport
+    
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.80 // 80% 覆蓋率
+            }
+        }
+    }
+}
+
+// 程式碼品質檢查
+check.dependsOn jacocoTestCoverageVerification
+
+// 自訂任務：執行所有測試並生成報告
+task testWithCoverage(type: Test) {
+    dependsOn test
+    finalizedBy jacocoTestReport
+    
+    doLast {
+        println "測試完成！查看覆蓋率報告：file://${buildDir}/reports/jacoco/test/html/index.html"
+    }
+}
