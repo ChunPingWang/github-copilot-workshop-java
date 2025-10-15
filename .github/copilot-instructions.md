@@ -31,63 +31,22 @@
 - 使用 Optional 處理可能為 null 的回傳值
 - 公開方法必須包含 JavaDoc 註解
 
-## 🧪 測試規範
+## 🧪 測試規範概述
 
-### 測試結構
-```
-src/
-├── main/java/
-└── test/java/
-    ├── unit/        # 單元測試
-    ├── integration/ # 整合測試
-    └── e2e/         # 端對端測試
-```
+本專案重視測試驅動開發，所有程式碼都應該有適當的測試覆蓋。
 
-### 測試命名慣例
-- **測試類別**: `{ClassName}Test` (例: `TaskServiceTest`)
-- **測試方法**: `{methodName}_when_{condition}_then_{expectedResult}`
-  ```java
-  @Test
-  void createTask_whenValidInput_thenReturnTask() { }
-  
-  @Test
-  void findTaskById_whenTaskNotExists_thenThrowException() { }
-  ```
+### 測試層級
+- **單元測試**: 測試個別類別和方法
+- **整合測試**: 測試元件之間的協作
+- **端對端測試**: 測試完整的業務流程
 
-### 測試品質要求
+### 基本要求
 - **程式碼覆蓋率**: 最低 80%
 - **測試架構**: Given-When-Then 模式
-- **Mock 使用**: 使用 Mockito 進行相依性模擬
-- **測試資料**: 使用 Test Fixtures 或 Builder Pattern
+- **測試隔離**: 每個測試獨立運行
+- **快速執行**: 單元測試應該快速完成
 
-### 測試範例
-```java
-@ExtendWith(MockitoExtension.class)
-class TaskServiceTest {
-    
-    @Mock
-    private TaskRepository taskRepository;
-    
-    @InjectMocks
-    private TaskService taskService;
-    
-    @Test
-    void createTask_whenValidInput_thenReturnTask() {
-        // Given
-        CreateTaskRequest request = new CreateTaskRequest("學習 Java");
-        Task expectedTask = new Task(1L, "學習 Java", false);
-        when(taskRepository.save(any(Task.class))).thenReturn(expectedTask);
-        
-        // When
-        Task actualTask = taskService.createTask(request);
-        
-        // Then
-        assertThat(actualTask).isNotNull();
-        assertThat(actualTask.getDescription()).isEqualTo("學習 Java");
-        assertThat(actualTask.isDone()).isFalse();
-    }
-}
-```
+> 📋 **詳細測試規範**: 參考 `.github/instructions/test.instructions.md` 獲取完整的測試開發指南
 
 ## 🏗️ 六角形架構概述
 
@@ -237,6 +196,7 @@ java {
 - **適配器層**: 參考 `.github/instructions/adapter.instructions.md`
 - **應用程式層**: 參考 `.github/instructions/application.instructions.md`
 - **配置層**: 參考 `.github/instructions/configuration.instructions.md`
+- **測試層**: 參考 `.github/instructions/test.instructions.md`
 
 ---
 
