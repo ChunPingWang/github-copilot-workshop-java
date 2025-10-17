@@ -314,9 +314,11 @@ private final Map<String, List<Task>> tasks = new LinkedHashMap<>();
 ### 5. 重構成六角形架構或三層式架構
 
   #### 六角形架構（Hexagonal Architecture）
+  > prompt
   ```
   產生六角形架構的說明與圖解，寫入 README.md的'5. 重構成六角形架構或三層式架構'下面的六角形架構下
   ```
+  > prompt
   ```
   將現有的 TaskList 類別重構為六角形架構：
   1. 提取 Task 實體的業務邏輯
@@ -327,17 +329,9 @@ private final Map<String, List<Task>> tasks = new LinkedHashMap<>();
   ```
   
   #### 三層式架構（Three-tier Architecture）
+  > prompt
   ```
   產生三層式架構的說明與圖解，寫入 README.md的'5. 重構成六角形架構或三層式架構'下面的三層式架構下
-  ```
-  
-  ```
-  將現有的 TaskList 類別重構為三層式架構：
-  1. 建立 TaskController 處理 HTTP 請求
-  2. 抽取 TaskService 包含業務邏輯
-  3. 建立 TaskRepository 處理資料存取
-  4. 定義 TaskDTO 用於資料傳輸
-  5. 實作異常處理和輸入驗證
   ```
   
 ### 6. Repository 模式實作
