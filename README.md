@@ -292,7 +292,7 @@ private final Map<String, List<Task>> tasks = new LinkedHashMap<>();
 - **程式碼規範**
 
 - **Copilot 協助規範制定**
-
+> prompt
 ```
 #createDirectory .github
 #createFile .github/copilot-instructions.md
@@ -306,6 +306,7 @@ private final Map<String, List<Task>> tasks = new LinkedHashMap<>();
 ### 4. 測試案例建立
 
 - **Copilot 測試生成**
+> prompt
 ```
 加入單元測試，包含正反向測試條件
 ```
